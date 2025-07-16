@@ -170,6 +170,15 @@ def parse_seasons_json(parsed_lambda_output):
         # You can log more details if needed, e.g., parsed_lambda_output.get('body')
         return None
 
+def fetch_player_bios(season):
+    url = f"{NHL_SKATER_BIOS_API_URL}{season}"
+
+    """Use the try except framework to make the get request and save the response to a variable.
+    You can just add the url as the single argument to the get function.
+    """
+
+    return requests.get(url)
+
 def lambda_handler(event, context):
     """
     First: invoke the GetNHLSeasonsLambda and save to raw_response
@@ -178,3 +187,7 @@ def lambda_handler(event, context):
     Fourth: Loop through seasons list to make repeated HTTP requests to the NHL_SKATER_BIOS_API_URL
     Fifth: Using new JSON write the processed payer bios to S3 in one file?
     """
+    lambda_response = invoke_get_nhl_seasons() # Step 1
+    parsed_lambda_output = parse_nhl_seasons_response(lambda_response) # Step 2
+    seasons_list = parse_seasons_json(parsed_lambda_output) # Step 3
+
