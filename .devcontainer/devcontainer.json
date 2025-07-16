@@ -1,0 +1,61 @@
+{
+    "name": "AWS Lambda/CDK Development",
+    // Use a pre-built dev container image that includes many common tools.
+    // This 'universal' image is a good starting point.
+    "image": "mcr.microsoft.com/devcontainers/universal:latest",
+
+    // Or, for a more specific Python image (often better for Python projects):
+    // "image": "mcr.microsoft.com/devcontainers/python:0-3.9", // Adjust Python version as needed (e.g., 3.10, 3.11, etc.)
+
+    "features": {
+        // Install Node.js and npm for TypeScript and AWS CDK
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "latest" // Or a specific version like "18", "20"
+        },
+        // Install the AWS CLI
+        "ghcr.io/devcontainers/features/aws-cli:1": {
+            "version": "latest"
+        },
+        // If you chose a universal image, you might explicitly add Python features
+        // If you chose a Python-specific image, these might be redundant or you
+        // might configure specific versions if the base image's version isn't ideal.
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "latest", // Or a specific version like "3.9", "3.10"
+            "installConda": false, // Set to true if you prefer Conda over pip/venv
+            "installPylint": true,
+            "installBlack": true
+        }
+    },
+
+    "customizations": {
+        "vscode": {
+            "settings": {
+                // Python interpreter path (important for venv if you manage it manually)
+                // If you let Codespaces manage venv, it often sets this automatically.
+                "python.defaultInterpreterPath": "/usr/local/bin/python", // Or a path relative to your project if venv is inside
+                "python.terminal.activateEnvironment": true, // Activates venv in new terminals
+                // General VS Code settings
+                "terminal.integrated.defaultProfile.linux": "bash"
+            },
+            "extensions": [
+                "ms-python.python",       // Python extension
+                "ms-azuretools.vscode-docker", // Docker extension (useful for container understanding)
+                "AmazonWebServices.aws-toolkit" // AWS Toolkit for VS Code
+            ]
+        }
+    },
+
+    // Commands to run after the container is created and your project code is copied.
+    "postCreateCommand": {
+        "install_cdk": "npm install -g aws-cdk",
+        "install_typescript": "npm install -g typescript"
+        // You might add commands here to install Python dependencies if your venv isn't used
+        // "install_python_deps": "pip install -r requirements.txt"
+    },
+
+    // Forward ports for local development (e.g., if you run a local server or Flask app)
+    "forwardPorts": [] // Example: [8000, 3000]
+
+    // Specifies a workspace folder for a multi-root workspace (if needed)
+    // "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
+}
