@@ -2,10 +2,10 @@
     "name": "AWS Lambda/CDK Development",
     // BEFORE: "image": "mcr.microsoft.com/devcontainers/universal:latest",
     // AFTER: Use a specific Python image version that matches your needs
-    "image": "mcr.microsoft.com/devcontainers/python:0-3.11", // Example: Python 3.11
+    // "image": "mcr.microsoft.com/devcontainers/python:0-3.11", // Example: Python 3.11
     // You can choose other versions:
     // "image": "mcr.microsoft.com/devcontainers/python:0-3.10",
-    // "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
+    "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
     // "image": "mcr.microsoft.com/devcontainers/python:0-3.12", // if you need latest
 
     "features": {
