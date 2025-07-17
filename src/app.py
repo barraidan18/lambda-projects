@@ -1,7 +1,16 @@
+"""
+This Lambda function loads the player bios data for all seasons and will only be run once.
+"""
+
 import boto3 as boto3
 import json as json
 import requests as requests
-from botocore.exceptions import ClientError
+from requests.exceptions import Timeout, ConnectionError, HTTPError, RequestException, ClientError
+import logging
+
+# Configure logging for your Lambda function
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 # Initialize the Lambda client globally for reuse across invocations
 # This helps with performance in subsequent calls within the same execution environment.
@@ -170,16 +179,45 @@ def parse_seasons_json(parsed_lambda_output):
         # You can log more details if needed, e.g., parsed_lambda_output.get('body')
         return None
 
-def fetch_player_bios(season):
-    url = f"{NHL_SKATER_BIOS_API_URL}{season}"
+def fetch_player_bios(season: int, position: str, timeout: tuple = (5,10)):
+    url = f"https://api.nhle.com/stats/rest/en/{position}/bios?limit=-1&start=0&cayenneExp=seasonId={season}"
 
     """Use the try except framework to make the get request and save the response to a variable.
     You can just add the url as the single argument to the get function.
     """
+    try:
+        response = requests.get(url, timeout=timeout)
+        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
 
-    return requests.get(url)
+        return response.json()
+
+    except Timeout as e:
+        logger.error(f"Request to NHL API timed out ({url}): {e}")
+        # You might want to retry the request here or return a specific error message
+        return None
+    except ConnectionError as e:
+        logger.error(f"Connection error to NHL API ({url}): {e}")
+        # This could be due to DNS issues, network unreachable, etc.
+        return None
+    except HTTPError as e:
+        logger.error(f"HTTP error from NHL API ({url}) - Status Code {e.response.status_code}: {e.response.text}")
+        # Handle specific HTTP status codes if needed (e.g., 404 Not Found, 500 Internal Server Error)
+        return None
+    except RequestException as e:
+        logger.error(f"An unexpected request error occurred with NHL API ({url}): {e}")
+        # This catches any other requests-related exceptions not covered above
+        return None
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}")
+        # Catch any other general Python exceptions
+        return None
+
 
 def lambda_handler(event, context):
+    
+    s3_bucket_name = "your-nhl-data-bucket" # <<< IMPORTANT: Replace with your S3 bucket name
+    s3 = boto3.client('s3')
+
     """
     First: invoke the GetNHLSeasonsLambda and save to raw_response
     Second: parse the seasons response
@@ -189,5 +227,48 @@ def lambda_handler(event, context):
     """
     lambda_response = invoke_get_nhl_seasons() # Step 1
     parsed_lambda_output = parse_nhl_seasons_response(lambda_response) # Step 2
-    seasons_list = parse_seasons_json(parsed_lambda_output) # Step 3
+    seasons = parse_seasons_json(parsed_lambda_output) # Step 3
+
+    # Step 4: loop through seasons using helper function
+    positions = ["skater", "goalie"]
+    for season in seasons:
+        for position in positions:
+            file_name = f"{position}-bios-{season}.json"
+            s3_key = f"nhl-player-bios/{file_name}" # Path inside your S3 bucket
+
+            logger.info(f"Attempting to fetch and save: {s3_key}")
+
+            # Call your helper function
+            player_data = fetch_player_bios(season, position) # Using the first helper function
+            results = []
+            
+            if player_data:
+                try:
+                    # Convert the dictionary to a JSON string
+                    json_data = json.dumps(player_data, indent=2)
+
+                    # Upload to S3
+                    s3.put_object(
+                        Bucket=s3_bucket_name,
+                        Key=s3_key,
+                        Body=json_data,
+                        ContentType='application/json'
+                    )
+                    logger.info(f"Successfully uploaded {s3_key} to S3.")
+                    results.append(f"Uploaded {s3_key}")
+                except Exception as e:
+                    logger.error(f"Error uploading {s3_key} to S3: {e}")
+                    results.append(f"Failed to upload {s3_key}: {e}")
+            else:
+                logger.warning(f"No data returned for Season: {season}, Position: {position}. Skipping S3 upload.")
+                results.append(f"No data for {file_name}")
+
+            # Optional: Add a small delay between API calls to be a good API citizen
+            # and avoid hitting rate limits. Adjust as needed.
+            # time.sleep(0.5) # Wait for 500 milliseconds
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'message': 'Processing complete', 'details': results})
+    }
 
