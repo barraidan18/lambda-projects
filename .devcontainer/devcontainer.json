@@ -1,6 +1,6 @@
 {
     "name": "AWS Lambda/CDK Development",
-    "image": "mcr.microsoft.com/devcontainers/python:0-3.9", // Or your chosen Python version
+    "image": "mcr.microsoft.com/devcontainers/python:0-3.11", // Or your chosen Python version
 
     "features": {
         "ghcr.io/devcontainers/features/node:1": {
