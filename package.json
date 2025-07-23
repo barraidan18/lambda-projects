@@ -11,16 +11,16 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "aws-cdk": "2.x.x", 
     "@types/jest": "^29.5.12",
-    "@types/node": "20.x.x", 
+    "@types/node": "^24.1.0",
+    "aws-cdk": "2.x.x",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "~5.3.3"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.x.x", 
-    "constructs": "^10.x.x" 
+    "aws-cdk-lib": "2.x.x",
+    "constructs": "^10.x.x"
   }
 }
