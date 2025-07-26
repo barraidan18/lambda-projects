@@ -33,7 +33,7 @@ export class NhlDataPipelineStack extends Stack {
 
     // 3. Define the Source Lambda Function (your data fetcher)
     const sourceLambda = new lambda.Function(this, 'NhlApiFetcherLambda', {
-      runtime: lambda.Runtime.PYTHON_3_9,
+      runtime: lambda.Runtime.PYTHON_3_11,
       handler: 'app.lambda_handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'src')),
       timeout: Duration.minutes(5),
