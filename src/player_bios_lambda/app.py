@@ -216,7 +216,7 @@ def fetch_player_bios(season: int, position: str, timeout: tuple = (5,10)):
 
 def lambda_handler(event, context):
     
-    s3_bucket_name = "your-nhl-data-bucket" # <<< IMPORTANT: Replace with your S3 bucket name
+    s3_bucket_name = "nhl-player-data-myproject-050925927410" # <<< IMPORTANT: Replace with your S3 bucket name
     s3 = boto3.client('s3')
 
     """

@@ -35,7 +35,7 @@ export class NhlDataPipelineStack extends Stack {
     const sourceLambda = new lambda.Function(this, 'NhlApiFetcherLambda', {
       runtime: lambda.Runtime.PYTHON_3_11,
       handler: 'app.lambda_handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'src')),
+      code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'src/player_bios_lambda')),
       timeout: Duration.minutes(5),
       memorySize: 256,
       environment: {
@@ -45,6 +45,7 @@ export class NhlDataPipelineStack extends Stack {
       },
     });
 
+    // 3.2 Define any new lambda functions which are located in the src/ folder
     // --- GRANT PERMISSIONS ---
 
     // Grant the Source Lambda permission to add objects (put) to the S3 bucket.
