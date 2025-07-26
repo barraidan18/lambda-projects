@@ -11,5 +11,5 @@ new NhlDataPipelineStack(app, 'NhlDataPipelineStack', {
   // Corrected: Use 'dataBucketName' to match the interface NhlDataPipelineStackProps
   dataBucketName: customBucketName, // This line was changed
   existingTargetLambdaName: myExistingTargetLambdaName, // Pass the name here
-  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT || '050925927410', region: process.env.CDK_DEFAULT_REGION || 'us-east-2'},
 });
