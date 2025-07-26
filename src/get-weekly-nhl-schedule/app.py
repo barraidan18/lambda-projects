@@ -10,15 +10,27 @@ import logging
 # date should come from the event
 date = "2023-11-10"
 
-def fetch_schedule(date=date):
+def fetch_schedule(date="2023-11-10"):
     url = f"https://api-web.nhle.com/v1/schedule/{date}"
 
     response = None
 
     try:
         response = requests.get(url=url)
+        response.raise_for_status()
+        print(response.json())
+    except Timeout as e:
+        print(f"Cound not fetch data due to:{e}")
+    except ConnectionError as e:
+        print(f"Could not fetch data due to:{e}")
+    except HTTPError as e:
+        print(f"Could not fetch data due to:{e}")
+    except RequestException as e:
+        print(f"Could not fetch data due to: {e}")
+    except ClientError as e:
+        print(f"Could not fetch data due to: {e}")
     except Exception as e:
-        print(f"Could not fetch data due to {e}")
+        print(f"Could not fetch data due to: {e}")
 
     return response
 
