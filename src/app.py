@@ -5,7 +5,8 @@ This Lambda function loads the player bios data for all seasons and will only be
 import boto3 as boto3
 import json as json
 import requests as requests
-from requests.exceptions import Timeout, ConnectionError, HTTPError, RequestException, ClientError
+from requests.exceptions import Timeout, ConnectionError, HTTPError, RequestException
+from botocore.exceptions import ClientError
 import logging
 
 # Configure logging for your Lambda function
